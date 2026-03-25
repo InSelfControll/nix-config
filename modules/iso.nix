@@ -22,7 +22,6 @@
   isoImage.volumeID = "NIXOS_OFIR";
   isoImage.squashfsCompression = "zstd -Xcompression-level 3";
 
-  boot.loader.timeout = 8;
 
   services.openssh.enable = true;
   users.users.root.initialPassword = "nixos";
