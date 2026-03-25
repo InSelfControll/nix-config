@@ -29,21 +29,13 @@
 
       iso = nixpkgs.lib.nixosSystem {
         inherit system;
-        modules = [
-          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
-          ({ pkgs, ... }: {
-            isoImage.isoName  = "nixos-ofir.iso";
-            isoImage.volumeID = "NIXOS_OFIR";
-            nix.settings.experimental-features = [ "nix-command" "flakes" ];
-            nixpkgs.config.allowUnfree = true;
-            services.openssh.enable = true;
-            users.users.root.initialPassword = "nixos";
-          })
-        ];
+        modules = [ ./modules/iso.nix ];
       };
+
     };
 
     packages.${system}.iso =
       self.nixosConfigurations.iso.config.system.build.isoImage;
   };
 }
+
