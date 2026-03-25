@@ -39,7 +39,6 @@
           ({ config, pkgs, lib, ... }: {
             isoImage.isoName  = "nixos-ofir.iso";
             isoImage.volumeID = "NIXOS_OFIR";
-            boot.loader.timeout = 8;
 
             # Flakes must be enabled on the live ISO so nixos-install works
             nix.settings.experimental-features = [ "nix-command" "flakes" ];
