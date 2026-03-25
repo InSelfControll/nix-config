@@ -17,8 +17,6 @@ in
   config = {
 
     system.stateVersion = "25.11";
-
-    # Enable flakes — required so nixos-install works during Calamares install
     nixpkgs.config.allowUnfree = true;
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -27,8 +25,7 @@ in
       settings.PermitRootLogin = "yes";
     };
 
-    # Disable display manager and desktop on headless hosts
-    services.displayManager.sddm.enable  = lib.mkIf (!isGraphical) (lib.mkForce false);
+    services.displayManager.sddm.enable    = lib.mkIf (!isGraphical) (lib.mkForce false);
     services.desktopManager.plasma6.enable = lib.mkIf (!isGraphical) (lib.mkForce false);
 
     environment.plasma6.excludePackages = lib.optionals isGraphical
@@ -155,4 +152,3 @@ SCRIPT
     };
   };
 }
-
