@@ -1,26 +1,35 @@
 { config, pkgs, lib, modulesPath, ... }:
 
+let
+  isGraphical = config.nixos-setup.graphical;
+in
 {
+  imports = [
+    "${modulesPath}/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
+  ];
+
   options.nixos-setup.graphical = lib.mkOption {
     type    = lib.types.bool;
-    default = false;
-    description = "Enable KDE Plasma + Calamares graphical installer.";
+    default = true;
+    description = "Enable KDE Plasma + Calamares. Set false for minimal/headless.";
   };
 
-  config = let
-    isGraphical = config.nixos-setup.graphical;
-  in {
-
-    imports = lib.optional isGraphical
-      "${modulesPath}/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix";
+  config = {
 
     system.stateVersion = "25.11";
+
+    # Enable flakes — required so nixos-install works during Calamares install
     nixpkgs.config.allowUnfree = true;
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
     services.openssh = {
       enable = true;
       settings.PermitRootLogin = "yes";
     };
+
+    # Disable display manager and desktop on headless hosts
+    services.displayManager.sddm.enable  = lib.mkIf (!isGraphical) (lib.mkForce false);
+    services.desktopManager.plasma6.enable = lib.mkIf (!isGraphical) (lib.mkForce false);
 
     environment.plasma6.excludePackages = lib.optionals isGraphical
       (with pkgs.kdePackages; [
@@ -146,3 +155,4 @@ SCRIPT
     };
   };
 }
+

@@ -56,9 +56,7 @@
 
             # Give the default KDE entry a clear label in the menu
             isoImage.grubTheme = null;
-            boot.loader.systemd-boot.extraConfig = ''
-              timeout 8
-            '';
+            #boot.loader.timeout = 8;
 
             # A small script on the live ISO that explains the two options
             # when the user lands in the KDE session
