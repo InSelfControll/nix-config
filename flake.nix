@@ -34,7 +34,6 @@
           ({ pkgs, ... }: {
             isoImage.isoName  = "nixos-ofir.iso";
             isoImage.volumeID = "NIXOS_OFIR";
-            boot.loader.timeout = 8;
             nix.settings.experimental-features = [ "nix-command" "flakes" ];
             nixpkgs.config.allowUnfree = true;
             services.openssh.enable = true;
