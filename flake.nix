@@ -5,7 +5,8 @@
 
   outputs = { self, nixpkgs }: let
     system = "x86_64-linux";
-  in {
+  in 
+  {
 
     nixosConfigurations = {
 
@@ -37,7 +38,6 @@
           ({ config, pkgs, lib, ... }: {
             isoImage.isoName  = "nixos-ofir.iso";
             isoImage.volumeID = "NIXOS_OFIR";
-            boot.loader.timeout = 8;
 
             nix.settings.experimental-features = [ "nix-command" "flakes" ];
             nixpkgs.config.allowUnfree = true;
@@ -88,11 +88,11 @@
 
                 # Detect partition naming (nvme uses p1/p2, others use 1/2)
                 if [[ "$DISK" == *"nvme"* ]]; then
-                  PART1="${DISK}p1"
-                  PART2="${DISK}p2"
+                  PART1="''${DISK}p1"
+                  PART2="''${DISK}p2"
                 else
-                  PART1="${DISK}1"
-                  PART2="${DISK}2"
+                  PART1="''${DISK}1"
+                  PART2="''${DISK}2"
                 fi
 
                 mkfs.fat  -F32 "$PART1"
@@ -163,3 +163,4 @@ EOF
       self.nixosConfigurations.iso.config.system.build.isoImage;
   };
 }
+
