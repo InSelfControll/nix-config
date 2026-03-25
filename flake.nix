@@ -3,7 +3,7 @@
 # Usage: bash apply-config.sh
 set -e
 
-REPO="https://github.com/InSelfControll/nix-config"   # <-- change to your repo URL
+REPO="https://github.com/InSelfControll/nix-config" 
 CONFIG_DIR="/etc/nixos-config"
 
 echo "======================================"
