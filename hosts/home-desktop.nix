@@ -47,29 +47,3 @@
 
   programs.firefox.enable = true;
 }
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
-
-  environment.plasma6.excludePackages = with (import <nixpkgs> {}).kdePackages; [
-    kate elisa okular gwenview spectacle plasma-browser-integration
-  ];
-
-  services.printing.enable = true;
-
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-  };
-
-  users.users.ofir = {
-    isNormalUser = true;
-    description = "ofir";
-    extraGroups = [ "networkmanager" "wheel" ];
-  };
-
-  programs.firefox.enable = true;
-}
-
