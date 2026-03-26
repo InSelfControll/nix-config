@@ -1,7 +1,28 @@
 { ... }: {
-  networking.hostName = "home-desktop";
-  users.users.root.initialPassword = "nixos";
+  networking.hostName = "nixos";
+  networking.networkmanager.enable = true;
 
-  # Set this to whatever lsblk shows as your disk
-  boot.loader.grub.device = "/dev/vda";
+  time.timeZone = "Asia/Jerusalem";
+  i18n.defaultLocale = "en_IL";
+
+  services.xserver.enable = true;
+  services.xserver.xkb.layout = "us";
+
+  services.printing.enable = true;
+
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+  };
+
+  users.users.ofir = {
+    isNormalUser = true;
+    description = "ofir";
+    extraGroups = [ "networkmanager" "wheel" ];
+  };
+
+  programs.firefox.enable = true;
 }

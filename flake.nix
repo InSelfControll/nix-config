@@ -13,7 +13,32 @@
 
     nixosConfigurations = {
 
+      # Apply this to an existing NixOS install:
+      # sudo nixos-rebuild switch --flake github:InSelfControll/nix-config#home-desktop --no-write-lock-file --refresh
       home-desktop = nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ./modules/base-system.nix
+          ./modules/dev-setup.nix
+          ./modules/core-tools.nix
+          ./modules/desktop-tools.nix
+          ./hosts/home-desktop.nix
+        ];
+      };
+
+      server = nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ./modules/base-system.nix
+          ./modules/dev-setup.nix
+          ./modules/core-tools.nix
+          ./modules/server-tools.nix
+          ./hosts/server.nix
+        ];
+      };
+
+      # Fresh install via nixos-anywhere (includes disko for partitioning)
+      home-desktop-install = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
           disko.nixosModules.disko
@@ -26,7 +51,7 @@
         ];
       };
 
-      server = nixpkgs.lib.nixosSystem {
+      server-install = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
           disko.nixosModules.disko
