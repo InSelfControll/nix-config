@@ -1,4 +1,6 @@
 { ... }: {
+  imports = [ /etc/nixos/hardware-configuration.nix ];
+
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
