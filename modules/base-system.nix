@@ -1,5 +1,4 @@
 { lib, ... }: {
-  # Use GRUB in BIOS mode — works on both BIOS and UEFI VMs
   boot.loader.grub = {
     enable = true;
     device = lib.mkDefault "nodev";
