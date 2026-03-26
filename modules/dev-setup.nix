@@ -1,57 +1,19 @@
-{ config, pkgs, lib, modulesPath, ... }:
+{ lib, ... }: {
+  nixpkgs.config.allowUnfree = true;
 
-let
-  isGraphical = config.nixos-setup.graphical;
-in
-{
-  imports = [
-    "${modulesPath}/installer/cd-dvd/installation-cd-graphical-calamares-plasma6.nix"
-  ];
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  options.nixos-setup.graphical = lib.mkOption {
-    type    = lib.types.bool;
-    default = true;
-    description = "Enable KDE Plasma + Calamares. Set false for minimal/headless.";
+  services.openssh = {
+    enable = true;
+    settings.PermitRootLogin = "yes";
   };
 
-  config = {
+  system.activationScripts.setupSkel = {
+    deps = [ "etc" ];
+    text = ''
+      mkdir -p /etc/skel/.nixos-features
 
-    system.stateVersion = "25.11";
-    nixpkgs.config.allowUnfree = true;
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-    services.openssh = {
-      enable = true;
-      settings.PermitRootLogin = "yes";
-    };
-
-    services.displayManager.sddm.enable    = lib.mkIf (!isGraphical) (lib.mkForce false);
-    services.desktopManager.plasma6.enable = lib.mkIf (!isGraphical) (lib.mkForce false);
-
-    environment.plasma6.excludePackages = lib.optionals isGraphical
-      (with pkgs.kdePackages; [
-        kate elisa okular gwenview spectacle plasma-browser-integration
-      ]);
-
-    programs.nix-ld = {
-      enable = true;
-      libraries = with pkgs; [
-        stdenv.cc.cc zlib openssl icu libunwind
-        xorg.libX11 xorg.libXcursor xorg.libXrandr xorg.libXcomposite
-        alsa-lib libglvnd
-      ];
-    };
-
-    environment.systemPackages = with pkgs;
-      [ git curl wget vim pciutils jq openssh appimage-run bun jdk21 ]
-      ++ lib.optionals isGraphical [ zenity ];
-
-    system.activationScripts.setupSkel = {
-      deps = [ "etc" ];
-      text = ''
-        mkdir -p /etc/skel/.nixos-features
-
-        cat > /etc/skel/.first_run_gui.sh << 'SCRIPT'
+      cat > /etc/skel/.first_run_gui.sh << 'SCRIPT'
 #!/usr/bin/env bash
 if [ -f ~/.setup_done ]; then exit 0; fi
 
@@ -75,8 +37,6 @@ if $HAS_GUI; then
     --separator="|") || exit 0
 else
   echo "=== NixOS Developer Setup (headless) ==="
-  echo "No display — Cursor and Warp will be skipped."
-  echo ""
   read -rp "Install Web stack (Node 22.21)? [Y/n] " ans
   [[ "$ans" =~ ^[Nn] ]] || CHOICES+="|Web (Node 22.21)"
   read -rp "Install AbacusAI CLI? [Y/n] " ans
@@ -92,7 +52,6 @@ fi
 [[ "$CHOICES" == *"Mobile"*   ]] && touch ~/.nixos-features/mobile
 
 if [[ "$CHOICES" == *"Web"* ]]; then
-  echo "==> Installing NVM + Node 22.21..."
   export NVM_DIR="$HOME/.nvm"
   curl -fsSo- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
   [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
@@ -100,14 +59,12 @@ if [[ "$CHOICES" == *"Web"* ]]; then
 fi
 
 if [[ "$CHOICES" == *"AbacusAI"* ]]; then
-  echo "==> Installing AbacusAI CLI..."
   mkdir -p ~/.abacusai_tool
   cd ~/.abacusai_tool && bun install @abacus-ai/cli
 fi
 
 if $HAS_GUI; then
   if [[ "$CHOICES" == *"Cursor"* ]]; then
-    echo "==> Downloading Cursor..."
     CURSOR_URL=$(curl -fsSL \
       "https://www.cursor.com/api/download?platform=linux-x64&releaseTrack=stable" \
       | jq -r '.downloadUrl')
@@ -116,7 +73,6 @@ if $HAS_GUI; then
   fi
 
   if [[ "$CHOICES" == *"Warp"* ]]; then
-    echo "==> Downloading Warp..."
     WARP_URL="https://releases.warp.dev/stable/v0.2025.03.18.08.02.stable_00/warp-terminal_0.2025.03.18.08.02.stable.00_amd64.deb"
     curl -fSL "$WARP_URL" -o /tmp/warp.deb
     cd /tmp && ar x warp.deb && tar -xf data.tar.* ./usr/bin/warp-terminal
@@ -124,8 +80,6 @@ if $HAS_GUI; then
     chmod +x ~/Applications/warp
     rm -f /tmp/warp.deb /tmp/data.tar.* /tmp/control.tar.*
   fi
-else
-  echo "Note: Cursor and Warp require a desktop session — skipped."
 fi
 
 sed -i '/bash ~\/.first_run_gui.sh/d' ~/.bashrc
@@ -133,22 +87,20 @@ rm -f ~/.first_run_gui.sh
 touch ~/.setup_done
 
 if $HAS_GUI; then
-  zenity --info --title="Setup Complete" \
-    --text="Done! Re-open your terminal to activate NVM."
+  zenity --info --title="Setup Complete" --text="Done! Re-open terminal to activate NVM."
 else
-  echo "=== Setup complete! Re-open your shell to activate NVM. ==="
+  echo "=== Setup complete! Re-open shell to activate NVM. ==="
 fi
 SCRIPT
 
-        chmod +x /etc/skel/.first_run_gui.sh
+      chmod +x /etc/skel/.first_run_gui.sh
 
-        grep -qxF 'bash ~/.first_run_gui.sh' /etc/skel/.bashrc 2>/dev/null || \
-          echo 'bash ~/.first_run_gui.sh' >> /etc/skel/.bashrc
+      grep -qxF 'bash ~/.first_run_gui.sh' /etc/skel/.bashrc 2>/dev/null || \
+        echo 'bash ~/.first_run_gui.sh' >> /etc/skel/.bashrc
 
-        grep -qxF 'alias abacusai=' /etc/skel/.bashrc 2>/dev/null || \
-          echo 'alias abacusai="$HOME/.abacusai_tool/node_modules/.bin/abacusai"' \
-            >> /etc/skel/.bashrc
-      '';
-    };
+      grep -qxF 'alias abacusai=' /etc/skel/.bashrc 2>/dev/null || \
+        echo 'alias abacusai="$HOME/.abacusai_tool/node_modules/.bin/abacusai"' \
+          >> /etc/skel/.bashrc
+    '';
   };
 }
