@@ -207,7 +207,7 @@ DESK
     echo "==> Downloading LM Studio..."
     LMS_VERSION=$(curl -fsSL "https://lmstudio.ai/api/releases/latest" 2>/dev/null \
       | jq -r '.version' 2>/dev/null || echo "0.3.6")
-    LMS_URL="https://installers.lmstudio.ai/linux/x64/${LMS_VERSION}/LM-Studio-${LMS_VERSION}-x64.AppImage"
+    LMS_URL="https://installers.lmstudio.ai/linux/x64/''${LMS_VERSION}/LM-Studio-''${LMS_VERSION}-x64.AppImage"
     curl -fSL "$LMS_URL" -o ~/Applications/lmstudio.AppImage || \
       curl -fSL "https://lmstudio.ai/download?os=linux" -o ~/Applications/lmstudio.AppImage
     chmod +x ~/Applications/lmstudio.AppImage
