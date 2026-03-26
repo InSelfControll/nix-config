@@ -1,11 +1,12 @@
 {
-  description = "Ofir's NixOS configurations";
+  #description = "Ofir's NixOS configurations";
 
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
 
   outputs = { self, nixpkgs }: let
     system = "x86_64-linux";
-  in {
+  in 
+  {
 
     nixosConfigurations = {
 
