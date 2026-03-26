@@ -1,4 +1,4 @@
-  { pkgs, ... }: {
+{ pkgs, ... }: {
   imports = [ /etc/nixos/hardware-configuration.nix ];
 
   networking.hostName = "nixos";
